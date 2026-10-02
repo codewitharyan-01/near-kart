@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #f6f8f9;
+  --foreground: #0a1220;
+  --card: #ffffff;
+  --card-foreground: #0a1220;
+  --muted: #eef1f5;
+  --muted-foreground: #5c6672;
+  --border: #e4e8ee;
+  --brand: #059669;
+  --brand-strong: #047857;
+  --brand-deep: #064e3b;
+  --brand-soft: #e7f8f1;
+  --brand-softer: #f2fbf7;
+  --accent: #f59e0b;
+  --accent-soft: #fef3e2;
+  --danger: #e11d48;
+  --danger-soft: #fde8ee;
+  --info: #0284c7;
+  --info-soft: #e6f4fb;
+  --ring: #10b981;
+}
+
+.dark {
+  --background: #0a0e14;
+  --foreground: #e8ecf2;
+  --card: #111722;
+  --card-foreground: #e8ecf2;
+  --muted: #1a2230;
+  --muted-foreground: #8d97a8;
+  --border: #222c3c;
+  --brand: #10b981;
+  --brand-strong: #34d399;
+  --brand-deep: #065f46;
+  --brand-soft: rgba(16, 185, 129, 0.14);
+  --brand-softer: rgba(16, 185, 129, 0.07);
+  --accent: #fbbf24;
+  --accent-soft: rgba(245, 158, 11, 0.14);
+  --danger: #fb7185;
+  --danger-soft: rgba(225, 29, 72, 0.16);
+  --info: #38bdf8;
+  --info-soft: rgba(2, 132, 199, 0.16);
+  --ring: #34d399;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-softer: var(--brand-softer);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.15rem;
+  --radius-3xl: 1.5rem;
+  --shadow-soft: 0 1px 2px rgba(10, 18, 32, 0.05), 0 8px 24px -12px rgba(10, 18, 32, 0.12);
+  --shadow-lift: 0 2px 4px rgba(10, 18, 32, 0.06), 0 16px 40px -16px rgba(10, 18, 32, 0.2);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: var(--brand);
+    color: #fff;
+  }
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility card-surface {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+  box-shadow: 0 1px 2px rgba(10, 18, 32, 0.05), 0 8px 24px -12px rgba(10, 18, 32, 0.12);
+}
+
+@utility brand-gradient {
+  background: linear-gradient(135deg, #10b981 0%, #059669 55%, #047857 100%);
+}
+
+@utility text-gradient {
+  background: linear-gradient(120deg, #059669, #0d9488 60%, #f59e0b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+.pulse-ring {
+  animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float-y {
+  animation: float-y 4s ease-in-out infinite;
+}
