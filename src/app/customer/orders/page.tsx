@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { Badge, Button, EmptyState, SectionTitle } from "@/components/ui/base";
 import { useApp } from "@/store/useApp";
+import { SmartImage } from "@/components/ui/smart-image";
+import { productImage, shopImage } from "@/lib/images";
 import { clockTime, dateShort, inr } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Radio } from "lucide-react";
@@ -35,14 +37,16 @@ export default function OrdersPage() {
               const shop = shops.find((s) => s.id === o.shopId);
               return (
                 <motion.div key={o.id} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <Link href={`/customer/orders/${o.id}`} className="card-surface flex items-center gap-3 p-3.5 transition-all hover:shadow-md hover:ring-1 hover:ring-brand/40">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted text-2xl">{shop?.emoji}</div>
+                  <Link href={`/customer/orders/${o.id}`} className="card-surface flex items-center gap-3 p-3.5 transition-all hover:shadow-lift hover:ring-1 hover:ring-foreground/20">
+                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl">
+                      <SmartImage src={shopImage(shop ?? { id: o.shopId, type: "" })} alt={shop?.name ?? "Shop"} seed={o.shopId} className="h-full w-full" />
+                    </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p className="truncate text-sm font-bold">{shop?.name}</p>
                         <span className="num text-[10px] text-muted-foreground">{o.code}</span>
                       </div>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{o.items.map((i) => `${i.emoji}×${i.qty}`).join("  ")}</p>
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">{o.items.map((i) => `${i.name} ×${i.qty}`).join(" · ")}</p>
                     </div>
                     <div className="shrink-0 text-right">
                       <Badge tone="accent" className="mb-1">● {o.status.replaceAll("_", " ").toLowerCase()}</Badge>
@@ -63,8 +67,10 @@ export default function OrdersPage() {
             {past.map((o) => {
               const shop = shops.find((s) => s.id === o.shopId);
               return (
-                <Link key={o.id} href={`/customer/orders/${o.id}`} className="card-surface flex items-center gap-3 p-3.5 transition-all hover:shadow-md">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted text-xl">{shop?.emoji}</div>
+                <Link key={o.id} href={`/customer/orders/${o.id}`} className="card-surface flex items-center gap-3 p-3.5 transition-all hover:shadow-lift">
+                  <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl">
+                    <SmartImage src={shopImage(shop ?? { id: o.shopId, type: "" })} alt={shop?.name ?? "Shop"} seed={o.id} className="h-full w-full" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-bold">{shop?.name}</p>

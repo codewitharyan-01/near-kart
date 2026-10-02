@@ -6,23 +6,24 @@ import { Minus, Plus, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------- Button ------------------------------- */
-type BtnVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "accent";
+type BtnVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "accent" | "brand";
 type BtnSize = "xs" | "sm" | "md" | "lg" | "icon" | "icon-sm";
 
 const btnVariants: Record<BtnVariant, string> = {
-  primary: "brand-gradient text-white shadow-sm hover:shadow-md hover:brightness-105 active:brightness-95",
-  secondary: "bg-muted text-foreground hover:bg-muted/70",
-  outline: "border bg-card hover:bg-muted/60",
-  ghost: "hover:bg-muted/70",
+  primary: "btn-ink shadow-sm hover:shadow-md active:shadow-sm",
+  brand: "bg-brand text-white shadow-sm hover:brightness-110 active:brightness-95",
+  secondary: "bg-muted text-foreground hover:bg-muted/60",
+  outline: "border bg-card hover:bg-muted/50",
+  ghost: "hover:bg-muted/60",
   danger: "bg-danger text-white hover:brightness-110",
-  accent: "bg-accent text-black hover:brightness-105",
+  accent: "bg-accent text-white hover:brightness-110",
 };
 const btnSizes: Record<BtnSize, string> = {
   xs: "h-7 px-2.5 text-xs rounded-lg gap-1",
-  sm: "h-9 px-3.5 text-sm rounded-xl gap-1.5",
-  md: "h-11 px-5 text-sm rounded-xl gap-2",
-  lg: "h-12 px-6 text-base rounded-2xl gap-2",
-  icon: "h-10 w-10 rounded-xl justify-center",
+  sm: "h-9 px-3.5 text-sm rounded-lg gap-1.5",
+  md: "h-10.5 px-5 text-sm rounded-xl gap-2",
+  lg: "h-12 px-6 text-[15px] rounded-xl gap-2",
+  icon: "h-9.5 w-9.5 rounded-xl justify-center",
   "icon-sm": "h-8 w-8 rounded-lg justify-center",
 };
 
@@ -35,7 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
         className={cn(
           "inline-flex items-center font-semibold transition-all duration-150 select-none",
           "focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2",
-          "disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]",
+          "disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98]",
           btnVariants[variant],
           btnSizes[size],
           className,
@@ -54,7 +55,7 @@ const fieldCls =
   "w-full rounded-xl border bg-card px-3.5 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:outline-2 focus:outline-ring focus:outline-offset-0 disabled:opacity-60";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...props }, ref) {
-  return <input ref={ref} className={cn(fieldCls, "h-11", className)} {...props} />;
+  return <input ref={ref} className={cn(fieldCls, "h-10.5", className)} {...props} />;
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...props }, ref) {
@@ -63,8 +64,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function Select({ className, children, ...props }, ref) {
   return (
-    <select ref={ref} className={cn(fieldCls, "h-11 appearance-none bg-[length:16px] pr-9", className)}
-      style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
+    <select ref={ref} className={cn(fieldCls, "h-10.5 appearance-none bg-[length:16px] pr-9", className)}
+      style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
       {...props}
     >
       {children}
@@ -75,7 +76,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (
     <label className={cn("block space-y-1.5", className)}>
-      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
       {children}
       {hint && <span className="block text-xs text-muted-foreground">{hint}</span>}
     </label>
@@ -126,7 +127,7 @@ export function Chip({ active, onClick, children, className }: { active?: boolea
       onClick={onClick}
       className={cn(
         "shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all",
-        active ? "border-brand bg-brand-soft text-brand" : "border-border bg-card text-muted-foreground hover:border-brand/40 hover:text-foreground",
+        active ? "border-foreground bg-foreground text-background" : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground",
         className,
       )}
     >
@@ -139,7 +140,7 @@ export function Chip({ active, onClick, children, className }: { active?: boolea
 export function Progress({ value, tone = "brand", className }: { value: number; tone?: "brand" | "accent" | "danger"; className?: string }) {
   const bg = tone === "brand" ? "bg-brand" : tone === "accent" ? "bg-accent" : "bg-danger";
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-muted", className)}>
+    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-muted", className)}>
       <motion.div className={cn("h-full rounded-full", bg)} initial={{ width: 0 }} animate={{ width: `${Math.min(100, Math.max(0, value))}%` }} transition={{ type: "spring", stiffness: 80, damping: 20 }} />
     </div>
   );
@@ -162,13 +163,15 @@ export function Avatar({ emoji, gradient = "from-emerald-500 to-teal-700", size 
 
 /* ----------------------------- QtyStepper ----------------------------- */
 export function Stepper({ qty, onChange, max = 99, small }: { qty: number; onChange: (q: number) => void; max?: number; small?: boolean }) {
-  const btn = cn("flex items-center justify-center rounded-lg bg-brand text-white hover:brightness-110 active:scale-95 transition", small ? "h-7 w-7" : "h-8 w-8");
+  const btn = cn("flex items-center justify-center rounded-lg bg-foreground text-background hover:opacity-80 active:scale-95 transition", small ? "h-7 w-7" : "h-8 w-8");
   return qty === 0 ? (
-    <Button size={small ? "xs" : "sm"} onClick={() => onChange(1)} disabled={max === 0}>Add</Button>
+    <Button size={small ? "xs" : "sm"} variant="secondary" className="border hover:border-foreground/40" onClick={() => onChange(1)} disabled={max === 0}>
+      Add
+    </Button>
   ) : (
-    <div className={cn("flex items-center gap-1 brand-gradient rounded-lg p-0.5", small && "text-sm")}>
+    <div className={cn("flex items-center gap-0.5 rounded-lg bg-foreground p-0.5 text-background", small && "text-sm")}>
       <button aria-label="decrease" className={btn} onClick={() => onChange(qty - 1)}><Minus size={14} /></button>
-      <span className="num min-w-6 text-center text-sm font-bold text-white">{qty}</span>
+      <span className="num min-w-6 text-center text-sm font-bold">{qty}</span>
       <button aria-label="increase" className={btn} onClick={() => onChange(Math.min(max, qty + 1))} disabled={qty >= max}><Plus size={14} /></button>
     </div>
   );
@@ -179,7 +182,7 @@ export function Stars({ value, size = 14, className }: { value: number; size?: n
   return (
     <span className={cn("inline-flex items-center gap-0.5", className)} aria-label={`${value} stars`}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <Star key={i} size={size} className={i <= Math.round(value) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"} />
+        <Star key={i} size={size} className={i <= Math.round(value) ? "fill-amber-500 text-amber-500" : "text-muted-foreground/30"} />
       ))}
     </span>
   );
@@ -207,7 +210,7 @@ export function EmptyState({ emoji, title, body, action }: { emoji: string; titl
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-14 text-center">
       <div className="float-y text-5xl">{emoji}</div>
-      <p className="mt-4 font-display text-lg font-bold">{title}</p>
+      <p className="mt-4 text-lg font-bold tracking-tight">{title}</p>
       {body && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{body}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -218,7 +221,7 @@ export function SectionTitle({ title, sub, action }: { title: string; sub?: stri
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>
-        <h2 className="font-display text-lg font-bold tracking-tight sm:text-xl">{title}</h2>
+        <h2 className="text-lg font-bold tracking-tight sm:text-xl">{title}</h2>
         {sub && <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{sub}</p>}
       </div>
       {action}

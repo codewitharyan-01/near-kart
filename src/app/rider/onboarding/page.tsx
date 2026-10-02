@@ -45,7 +45,7 @@ export default function RiderOnboardingPage() {
       <div className="mt-4 flex items-center gap-1.5">
         {STEPS.map((s, i) => (
           <div key={s} className="flex flex-1 items-center gap-1.5">
-            <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold", i < step ? "bg-brand text-white" : i === step ? "brand-gradient text-white ring-4 ring-brand/20" : "bg-muted text-muted-foreground")}>
+            <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold", i < step ? "bg-brand text-white" : i === step ? "bg-foreground text-white ring-4 ring-foreground/15" : "bg-muted text-muted-foreground")}>
               {i < step ? <Check size={13} /> : i + 1}
             </div>
             {i < STEPS.length - 1 && <div className={cn("h-0.5 flex-1 rounded", i < step ? "bg-brand" : "bg-muted")} />}

@@ -5,6 +5,8 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { AlertTriangle, Banknote, Clock3, PackageCheck, ShoppingBag, Siren, Store, TrendingUp, Truck, Users, XCircle } from "lucide-react";
 import { useApp } from "@/store/useApp";
 import { demandForecast } from "@/lib/algorithms";
+import { SmartImage } from "@/components/ui/smart-image";
+import { shopImage } from "@/lib/images";
 import { Badge, StatCard } from "@/components/ui/base";
 import { inr, timeAgo } from "@/lib/utils";
 
@@ -115,7 +117,9 @@ export default function AdminOverview() {
           <div className="space-y-2.5">
             {live.slice(0, 5).map((o) => (
               <div key={o.id} className="flex items-center gap-3 rounded-xl border p-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-soft text-sm">{shops.find((s) => s.id === o.shopId)?.emoji}</div>
+                <div className="h-9 w-9 overflow-hidden rounded-lg">
+                  <SmartImage src={shopImage(shops.find((s) => s.id === o.shopId) ?? { id: o.shopId, type: "" })} alt="Shop" seed={o.shopId} className="h-full w-full" />
+                </div>
                 <div className="min-w-0 flex-1">
                   <p className="num text-sm font-bold">{o.code} <span className="ml-1 text-xs font-normal text-muted-foreground">{o.customerName.split(" ")[0]} · {o.address.area}</span></p>
                   <p className="text-xs text-muted-foreground">{shops.find((s) => s.id === o.shopId)?.name} · rider {riders.find((r) => r.id === o.riderId)?.name ?? "pending"}</p>

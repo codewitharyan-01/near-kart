@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BadgePercent, Coins, TicketPercent, Trash2, Truck } from "lucide-react";
 import { MIN_ORDER, cartValue, useApp } from "@/store/useApp";
-import { basketSuggestions, deliveryFeeFor } from "@/lib/algorithms";
+import { deliveryFeeFor } from "@/lib/algorithms";
 import { Button, EmptyState, Input, SectionTitle, Stepper, Switch } from "@/components/ui/base";
 import { Dialog } from "@/components/ui/overlays";
+import { PairingsRow } from "@/components/customer/shared";
+import { SmartImage } from "@/components/ui/smart-image";
+import { productImage } from "@/lib/images";
 import { inr } from "@/lib/utils";
 
 export default function CartPage() {
@@ -41,10 +44,14 @@ export default function CartPage() {
   const coinDiscount = useCoins ? Math.min(loyalty.coins, 50) : 0;
   const total = Math.max(0, itemTotal + (freeShip ? 0 : deliveryFee) - couponDiscount - coinDiscount);
 
-  const suggestions = useMemo(() => {
-    if (!cart.shopId) return [];
-    return basketSuggestions(products, cart.shopId, gap || 40, Object.keys(cart.items));
-  }, [products, cart, gap]);
+  const seedNames = lines.map((l) => l.p.name);
+  const exclude = entries.map(([pid]) => pid);
+  const suggestions = cart.shopId
+    ? products
+        .filter((p) => p.shopId === cart.shopId && p.stock > 0 && p.status === "active" && !exclude.includes(p.id) && p.price <= (gap || 60))
+        .sort((a, b) => b.popularity - a.popularity)
+        .slice(0, 6)
+    : [];
 
   if (entries.length === 0 || !shop) {
     return (
@@ -52,7 +59,7 @@ export default function CartPage() {
         emoji="🛒"
         title="Your cart is empty"
         body="Fill it with goodies from your neighbourhood shops."
-        action={<Link href="/customer"><Button>Start shopping</Button></Link>}
+        action={<Link href="/customer"><Button>Browse essentials</Button></Link>}
       />
     );
   }
@@ -61,15 +68,15 @@ export default function CartPage() {
     <div className="space-y-5">
       <SectionTitle
         title="Your cart"
-        sub={`${shop.emoji} ${shop.name} · one shop per order`}
+        sub={`${shop.name} · one shop per order · ${shop.area}`}
         action={<button onClick={() => { clearCart(); pushToast({ title: "Cart cleared", kind: "info" }); }} className="flex items-center gap-1 text-xs font-semibold text-danger hover:underline"><Trash2 size={13} /> Clear</button>}
       />
 
       {/* items */}
-      <div className="card-surface divide-y p-1">
+      <div className="card-surface divide-y p-1.5">
         {lines.map(({ p, qty }) => (
-          <div key={p.id} className="flex items-center gap-3 p-2.5">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted text-2xl">{p.emoji}</div>
+          <div key={p.id} className="flex items-center gap-3 p-2">
+            <SmartImage src={productImage(p)} alt={p.name} seed={p.id} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{p.name}</p>
               <p className="text-xs text-muted-foreground">{p.packSize} · {inr(p.price)}</p>
@@ -80,30 +87,36 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* free delivery nudge — progress psychology */}
+      {/* free delivery nudge */}
       {freeGap > 0 ? (
         <div className="card-surface p-4">
           <p className="flex items-center gap-2 text-sm font-semibold">
-            <Truck size={16} className="text-brand" /> Add <span className="num text-brand">{inr(freeGap)}</span> more for FREE delivery
+            <Truck size={15} className="text-brand" /> Add <span className="num text-brand">{inr(freeGap)}</span> more for FREE delivery
           </p>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-            <div className="h-full brand-gradient rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (itemTotal / 299) * 100)}%` }} />
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-foreground transition-all duration-500" style={{ width: `${Math.min(100, (itemTotal / 299) * 100)}%` }} />
           </div>
-          <p className="mt-1.5 text-[11px] text-muted-foreground">Free delivery above ₹299 · otherwise ₹25 flat</p>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">Free above ₹299 · otherwise ₹25 flat</p>
         </div>
       ) : (
-        <div className="flex items-center gap-2 rounded-2xl bg-brand-soft p-4 text-sm font-semibold text-brand">
-          🎉 You&apos;ve unlocked FREE delivery on this order!
+        <div className="flex items-center gap-2 rounded-2xl border border-brand/30 bg-brand-softer p-4 text-sm font-semibold text-brand">
+          Free delivery unlocked on this order
         </div>
       )}
 
+      {/* pairing suggestions — the star feature */}
+      <div className="card-surface p-4">
+        <PairingsRow seedNames={seedNames} shopId={cart.shopId!} exclude={exclude} />
+      </div>
+
       {/* coupons */}
       <div className="card-surface space-y-3 p-4">
-        <p className="flex items-center gap-2 text-sm font-bold"><TicketPercent size={16} className="text-accent" /> Coupons & offers</p>
+        <p className="flex items-center gap-2 text-sm font-bold"><TicketPercent size={15} className="text-accent" /> Coupons & offers</p>
         {appliedCoupons.length === 0 ? (
           <div className="flex gap-2">
             <Input value={coupon} onChange={(e) => setCoupon(e.target.value)} placeholder="Enter code e.g. NEAR25" className="uppercase" />
             <Button
+              variant="brand"
               onClick={() => {
                 const r = applyCoupon(coupon);
                 pushToast({ title: r.message, kind: r.ok ? "success" : "warn" });
@@ -128,7 +141,7 @@ export default function CartPage() {
             <button
               key={o.id}
               onClick={() => { const r = applyCoupon(o.code); pushToast({ title: r.message, kind: r.ok ? "success" : "warn" }); }}
-              className="rounded-lg border border-dashed border-brand/50 bg-brand-softer px-2.5 py-1.5 text-[11px] font-bold text-brand transition hover:bg-brand-soft"
+              className="rounded-lg border border-dashed border-brand/40 bg-brand-softer px-2.5 py-1.5 text-[11px] font-bold text-brand transition hover:bg-brand-soft"
             >
               {o.code} · {o.title}
             </button>
@@ -139,30 +152,30 @@ export default function CartPage() {
       {/* NearCoins */}
       <div className="card-surface flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent"><Coins size={18} /></div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent"><Coins size={17} /></div>
           <div>
             <p className="text-sm font-bold">Use NearCoins</p>
-            <p className="text-xs text-muted-foreground">{loyalty.coins} coins available · max {inr(Math.min(loyalty.coins, 50))} off</p>
+            <p className="text-xs text-muted-foreground">{loyalty.coins} available · max {inr(Math.min(loyalty.coins, 50))} off</p>
           </div>
         </div>
         <Switch checked={useCoins} onChange={toggleUseCoins} label="Use NearCoins" />
       </div>
 
-      {/* min-order gate with suggestions */}
+      {/* min-order gate */}
       {gap > 0 && (
         <div className="rounded-2xl border border-accent/40 bg-accent-soft p-4">
           <p className="text-sm font-bold text-accent">Add {inr(gap)} more to place your order</p>
-          <p className="mt-0.5 text-xs text-accent/80">Minimum order is {inr(MIN_ORDER)} — it keeps delivery fast and affordable for everyone.</p>
-          <Button size="sm" variant="accent" className="mt-3" onClick={() => setSuggestOpen(true)}>Add recommended items ✨</Button>
-          <Dialog open={suggestOpen} onClose={() => setSuggestOpen(false)} title="People also add">
+          <p className="mt-0.5 text-xs text-accent/80">The ₹100 minimum keeps delivery fast and affordable for everyone.</p>
+          <Button size="sm" variant="accent" className="mt-3" onClick={() => setSuggestOpen(true)}>Add recommended items</Button>
+          <Dialog open={suggestOpen} onClose={() => setSuggestOpen(false)} title="Top picks from this shop">
             <div className="grid grid-cols-2 gap-2">
               {suggestions.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => { useApp.getState().addToCart(p.id, 1); pushToast({ title: `${p.name} added`, kind: "success" }); }}
-                  className="flex items-center gap-2 rounded-xl border p-2.5 text-left transition hover:border-brand"
+                  className="flex items-center gap-2.5 rounded-xl border p-2 text-left transition hover:border-foreground"
                 >
-                  <span className="text-xl">{p.emoji}</span>
+                  <SmartImage src={productImage(p)} alt={p.name} seed={p.id} className="h-11 w-11 rounded-lg object-cover" />
                   <span className="min-w-0">
                     <span className="block truncate text-xs font-semibold">{p.name}</span>
                     <span className="num block text-[11px] text-muted-foreground">{inr(p.price)}</span>
@@ -190,7 +203,7 @@ export default function CartPage() {
             <span className={`num font-semibold ${String(v).startsWith("−") ? "text-brand" : "text-foreground"}`}>{v}</span>
           </div>
         ))}
-        <div className="flex justify-between border-t pt-2.5 text-base font-extrabold">
+        <div className="flex justify-between border-t pt-2.5 text-base font-bold">
           <span>To pay</span>
           <span className="num">{inr(total)}</span>
         </div>

@@ -78,7 +78,7 @@ export default function DeliveryFlowPage({ params }: { params: Promise<{ id: str
       <Link href="/rider" className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-brand"><ChevronLeft size={16} /> Today&apos;s jobs</Link>
 
       {/* earnings banner */}
-      <div className="brand-gradient mt-3 rounded-2xl p-4 text-white">
+      <div className="bg-foreground mt-3 rounded-2xl p-4 text-background">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-white/80">Trip {order.code} · {order.items.length} items</p>
@@ -119,7 +119,7 @@ export default function DeliveryFlowPage({ params }: { params: Promise<{ id: str
         <ol className="space-y-3">
           {routeSteps.map((s, i) => (
             <li key={s.id} className="flex items-center gap-3">
-              <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-brand text-white" : s.active ? "brand-gradient text-white ring-4 ring-brand/20" : "bg-muted text-muted-foreground")}>
+              <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold", s.done ? "bg-brand text-white" : s.active ? "bg-foreground text-white ring-4 ring-foreground/15" : "bg-muted text-muted-foreground")}>
                 {s.done ? "✓" : i + 1}
               </div>
               <p className={cn("text-sm", s.active ? "font-bold text-brand" : s.done ? "text-muted-foreground" : "font-semibold text-foreground")}>{s.label}</p>

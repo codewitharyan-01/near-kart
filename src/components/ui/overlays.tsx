@@ -33,7 +33,7 @@ export function Dialog({ open, onClose, title, children, wide }: { open: boolean
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted sm:hidden" />
             {title && (
               <div className="mb-4 flex items-center justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">{title}</h3>
+                <h3 className="text-lg font-bold">{title}</h3>
                 <button onClick={onClose} aria-label="Close dialog" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted">
                   <X size={16} />
                 </button>
@@ -72,7 +72,7 @@ export function Sheet({ open, onClose, title, children, side = "right" }: { open
             )}
           >
             <div className="mb-4 flex items-center justify-between gap-3">
-              <h3 className="font-display text-lg font-bold">{title}</h3>
+              <h3 className="text-lg font-bold">{title}</h3>
               <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted">
                 <X size={16} />
               </button>

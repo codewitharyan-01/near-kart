@@ -99,7 +99,7 @@ export default function ShopOrdersPage() {
               <ul className="mt-3 grid gap-1 text-sm sm:grid-cols-2">
                 {o.items.map((i) => (
                   <li key={i.productId} className="flex items-center gap-2">
-                    <span>{i.emoji}</span>
+                    
                     <span className="min-w-0 flex-1 truncate">{i.name}</span>
                     <span className="num font-bold">×{i.qty}</span>
                   </li>
@@ -197,7 +197,7 @@ export default function ShopOrdersPage() {
                 <thead className="bg-muted"><tr><TH>Item</TH><TH className="text-right">Qty</TH><TH className="text-right">Amount</TH></tr></thead>
                 <tbody>
                   {detail.items.map((i) => (
-                    <TRow key={i.productId}><TD>{i.emoji} {i.name}</TD><TD className="text-right num">×{i.qty}</TD><TD className="text-right num">{inr(i.price * i.qty)}</TD></TRow>
+                    <TRow key={i.productId}><TD>{i.name}</TD><TD className="text-right num">×{i.qty}</TD><TD className="text-right num">{inr(i.price * i.qty)}</TD></TRow>
                   ))}
                   <TRow><TD className="font-bold" >Total</TD><TD /><TD className="text-right num font-bold">{inr(detail.itemTotal)}</TD></TRow>
                 </tbody>

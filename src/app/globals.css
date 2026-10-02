@@ -3,47 +3,51 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #f6f8f9;
-  --foreground: #0a1220;
+  --background: #fafaf8;
+  --foreground: #131511;
   --card: #ffffff;
-  --card-foreground: #0a1220;
-  --muted: #eef1f5;
-  --muted-foreground: #5c6672;
-  --border: #e4e8ee;
-  --brand: #059669;
-  --brand-strong: #047857;
+  --card-foreground: #131511;
+  --muted: #f1f0ec;
+  --muted-foreground: #71706a;
+  --border: #e8e6e0;
+  --brand: #047857;
+  --brand-strong: #065f46;
   --brand-deep: #064e3b;
-  --brand-soft: #e7f8f1;
-  --brand-softer: #f2fbf7;
-  --accent: #f59e0b;
-  --accent-soft: #fef3e2;
-  --danger: #e11d48;
-  --danger-soft: #fde8ee;
-  --info: #0284c7;
-  --info-soft: #e6f4fb;
-  --ring: #10b981;
+  --brand-soft: #e6f2ec;
+  --brand-softer: #f2f8f5;
+  --accent: #b45309;
+  --accent-soft: #faf1e3;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+  --info: #0369a1;
+  --info-soft: #e8f3fa;
+  --ring: #047857;
+  --btn: #171812;
+  --btn-fg: #ffffff;
 }
 
 .dark {
-  --background: #0a0e14;
-  --foreground: #e8ecf2;
-  --card: #111722;
-  --card-foreground: #e8ecf2;
-  --muted: #1a2230;
-  --muted-foreground: #8d97a8;
-  --border: #222c3c;
+  --background: #0f100e;
+  --foreground: #eae8e2;
+  --card: #171814;
+  --card-foreground: #eae8e2;
+  --muted: #20211d;
+  --muted-foreground: #9d9c93;
+  --border: #2a2b26;
   --brand: #10b981;
   --brand-strong: #34d399;
   --brand-deep: #065f46;
-  --brand-soft: rgba(16, 185, 129, 0.14);
-  --brand-softer: rgba(16, 185, 129, 0.07);
-  --accent: #fbbf24;
-  --accent-soft: rgba(245, 158, 11, 0.14);
-  --danger: #fb7185;
-  --danger-soft: rgba(225, 29, 72, 0.16);
+  --brand-soft: rgba(16, 185, 129, 0.13);
+  --brand-softer: rgba(16, 185, 129, 0.06);
+  --accent: #d97706;
+  --accent-soft: rgba(217, 119, 6, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(220, 38, 38, 0.15);
   --info: #38bdf8;
-  --info-soft: rgba(2, 132, 199, 0.16);
-  --ring: #34d399;
+  --info-soft: rgba(3, 105, 161, 0.18);
+  --ring: #10b981;
+  --btn: #10b981;
+  --btn-fg: #04120c;
 }
 
 @theme inline {
@@ -66,13 +70,15 @@
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
   --color-ring: var(--ring);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
-  --radius-xl: 0.875rem;
-  --radius-2xl: 1.15rem;
-  --radius-3xl: 1.5rem;
-  --shadow-soft: 0 1px 2px rgba(10, 18, 32, 0.05), 0 8px 24px -12px rgba(10, 18, 32, 0.12);
-  --shadow-lift: 0 2px 4px rgba(10, 18, 32, 0.06), 0 16px 40px -16px rgba(10, 18, 32, 0.2);
+  --color-btn: var(--btn);
+  --color-btn-fg: var(--btn-fg);
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1.1rem;
+  --radius-3xl: 1.4rem;
+  --shadow-soft: 0 1px 2px rgba(20, 22, 17, 0.04), 0 6px 20px -10px rgba(20, 22, 17, 0.1);
+  --shadow-lift: 0 2px 4px rgba(20, 22, 17, 0.05), 0 18px 44px -20px rgba(20, 22, 17, 0.24);
 }
 
 @layer base {
@@ -85,13 +91,17 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    letter-spacing: -0.011em;
   }
   ::selection {
     background: var(--brand);
     color: #fff;
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.028em;
   }
 }
 
@@ -110,25 +120,26 @@
 @utility card-surface {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 1.15rem;
-  box-shadow: 0 1px 2px rgba(10, 18, 32, 0.05), 0 8px 24px -12px rgba(10, 18, 32, 0.12);
+  border-radius: 1.1rem;
+  box-shadow: 0 1px 2px rgba(20, 22, 17, 0.04), 0 6px 20px -10px rgba(20, 22, 17, 0.08);
 }
 
-@utility brand-gradient {
-  background: linear-gradient(135deg, #10b981 0%, #059669 55%, #047857 100%);
+@utility btn-ink {
+  background: var(--btn);
+  color: var(--btn-fg);
 }
 
 @utility text-gradient {
-  background: linear-gradient(120deg, #059669, #0d9488 60%, #f59e0b);
+  background: linear-gradient(110deg, var(--foreground) 55%, var(--brand) 90%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
-  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(4, 120, 87, 0.35); }
+  70% { box-shadow: 0 0 0 9px rgba(4, 120, 87, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(4, 120, 87, 0); }
 }
 .pulse-ring {
   animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -146,7 +157,7 @@
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   animation: shimmer 1.6s infinite;
 }
 

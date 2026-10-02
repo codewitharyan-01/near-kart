@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useApp, selectUserLoc } from "@/store/useApp";
 import { rankShops } from "@/lib/algorithms";
 import { Chip, Select, SectionTitle, EmptyState } from "@/components/ui/base";
@@ -43,8 +43,8 @@ export default function ShopsPage() {
           <Chip key={f.id} active={filter.includes(f.id)} onClick={() => toggle(f.id)}>{f.label}</Chip>
         ))}
         <div className="ml-auto w-40 shrink-0">
-          <Select value={sort} onChange={(e) => setSort(e.target.value)} className="h-9 text-xs" aria-label="Sort shops">
-            <option value="ranked">✨ Smart ranked</option>
+          <Select value={sort} onChange={(e) => setSort(e.target.value)} className="h-9 rounded-full text-xs" aria-label="Sort shops">
+            <option value="ranked">Smart ranked</option>
             <option value="nearest">Nearest first</option>
             <option value="fastest">Fastest delivery</option>
             <option value="rating">Highest rating</option>
@@ -52,22 +52,15 @@ export default function ShopsPage() {
           </Select>
         </div>
       </div>
-      <p className="flex items-center gap-1.5 rounded-xl bg-brand-softer px-3 py-2 text-xs text-brand">
-        <Sparkles size={13} /> Smart ranking blends distance, rating, prep speed and shop reliability.
+      <p className="flex items-center gap-1.5 rounded-xl bg-brand-softer px-3.5 py-2.5 text-xs font-medium text-brand">
+        <Sparkles size={13} /> Smart ranking blends distance, rating, prep speed and shop reliability — the first result is usually at your door fastest.
       </p>
       {results.length === 0 ? (
         <EmptyState emoji="🔍" title="No shops match those filters" body="Try removing a filter or check back during shop hours." />
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           {results.map((r) => (
-            <div key={r.shop.id} className="relative">
-              <ShopCard shop={r.shop} distKm={r.distKm} wide />
-              {r.shop.verified && (
-                <span className="absolute -top-2 right-3 flex items-center gap-1 rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
-                  <ShieldCheck size={10} /> Verified Local Shop
-                </span>
-              )}
-            </div>
+            <ShopCard key={r.shop.id} shop={r.shop} distKm={r.distKm} wide />
           ))}
         </div>
       )}

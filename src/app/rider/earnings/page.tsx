@@ -45,7 +45,7 @@ export default function RiderEarningsPage() {
               <span className="num font-bold text-brand">{v}</span>
             </div>
           ))}
-          <div className="flex items-center justify-between rounded-xl brand-gradient px-3.5 py-3 text-white">
+          <div className="flex items-center justify-between rounded-xl bg-foreground px-3.5 py-3 text-background">
             <span className="font-bold">Example trip (2 km, peak)</span>
             <span className="num text-lg font-extrabold">₹32</span>
           </div>

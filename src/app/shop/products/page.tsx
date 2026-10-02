@@ -5,6 +5,8 @@ import { Eye, EyeOff, Package, PackagePlus, Pencil, Upload } from "lucide-react"
 import { useApp } from "@/store/useApp";
 import { Badge, Button, EmptyState, Field, Input, Select, StatCard } from "@/components/ui/base";
 import { Dialog, TRow, TH, TD } from "@/components/ui/overlays";
+import { SmartImage } from "@/components/ui/smart-image";
+import { productImage } from "@/lib/images";
 import { cn, inr, timeAgo } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -73,7 +75,7 @@ export default function ShopProductsPage() {
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={cn("rounded-full px-3.5 py-1.5 text-xs font-bold transition", tab === id ? "brand-gradient text-white" : "bg-muted text-muted-foreground hover:text-foreground")}
+            className={cn("rounded-full px-3.5 py-1.5 text-xs font-bold transition", tab === id ? "bg-foreground text-white" : "bg-muted text-muted-foreground hover:text-foreground")}
           >
             {label}
           </button>
@@ -109,7 +111,9 @@ export default function ShopProductsPage() {
                     <TD><input type="checkbox" aria-label={`Select ${p.name}`} checked={selected.has(p.id)} onChange={() => toggleSelect(p.id)} className="h-4 w-4 rounded accent-emerald-600" /></TD>
                     <TD>
                       <div className="flex items-center gap-2.5">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-lg">{p.emoji}</span>
+                        <span className="block h-9 w-9 overflow-hidden rounded-lg">
+                          <SmartImage src={productImage(p)} alt={p.name} seed={p.id} className="h-full w-full" />
+                        </span>
                         <div>
                           <p className="text-sm font-semibold">{p.name}</p>
                           <p className="text-[11px] text-muted-foreground">{p.brand} · {p.packSize}</p>

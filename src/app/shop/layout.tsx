@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Home, LayoutGrid, Package, Percent, ReceiptIndianRupee, Settings, Store, ExternalLink, TimerReset } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle } from "@/components/brand/shell";
-import { Badge, Switch } from "@/components/ui/base";
+import { Home, LayoutGrid, Package, Percent, ReceiptIndianRupee, Settings, ExternalLink } from "lucide-react";
+import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
+import { Badge } from "@/components/ui/base";
+import { SmartImage } from "@/components/ui/smart-image";
 import { useApp } from "@/store/useApp";
+import { shopImage } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -82,6 +84,7 @@ export default function ShopLayout({ children }: LayoutProps<"/shop">) {
 
   return (
     <AppReady>
+      <LocationGate role="shop" />
       <div className="flex min-h-screen">
         {/* sidebar */}
         <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r bg-card lg:flex">
@@ -90,7 +93,9 @@ export default function ShopLayout({ children }: LayoutProps<"/shop">) {
           </div>
           <div className="border-b p-4">
             <div className="flex items-center gap-3">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-xl ${shop.gradient}`}>{shop.emoji}</div>
+              <div className="h-11 w-11 overflow-hidden rounded-xl">
+                <SmartImage src={shopImage(shop)} alt={shop.name} seed={shop.id} className="h-full w-full" />
+              </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold">{shop.name}</p>
                 <p className="text-[11px] text-muted-foreground">ID: NK-SH-0042</p>

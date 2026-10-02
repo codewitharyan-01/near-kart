@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BarChart3, Gavel, LayoutDashboard, Package, ShieldCheck, Users } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle } from "@/components/brand/shell";
+import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
 import { Badge } from "@/components/ui/base";
 import { useApp } from "@/store/useApp";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
 
   return (
     <AppReady>
+      <LocationGate role="admin" />
       <div className="flex min-h-screen">
         <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r bg-card lg:flex">
           <div className="flex h-16 items-center border-b px-5"><Logo size={28} /></div>

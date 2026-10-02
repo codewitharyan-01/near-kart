@@ -8,6 +8,7 @@ import { MIN_ORDER, cartValue, useApp } from "@/store/useApp";
 import { deliveryFeeFor } from "@/lib/algorithms";
 import { Button, Field, Input, Textarea, Badge, EmptyState, SectionTitle } from "@/components/ui/base";
 import { Dialog } from "@/components/ui/overlays";
+import { ChangeLocationButton } from "@/components/brand/shell";
 import { cn, inr } from "@/lib/utils";
 import type { Order } from "@/types";
 
@@ -86,7 +87,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle title="Checkout" sub={`${shop.emoji} ${shop.name} · arriving in ~${22} min`} />
+      <SectionTitle title="Checkout" sub={`${shop.name} · arriving in ~${22} min`} action={<ChangeLocationButton compact />} />
 
       {/* addresses */}
       <div className="space-y-2">

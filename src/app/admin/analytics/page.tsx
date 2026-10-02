@@ -160,7 +160,7 @@ export default function AdminAnalyticsPage() {
               <div key={l as string}>
                 <div className="flex justify-between text-xs font-semibold"><span>{l}</span><span className="num text-brand">{v}% repeat</span></div>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full brand-gradient rounded-full" style={{ width: `${v}%` }} />
+                  <div className="h-full bg-foreground rounded-full" style={{ width: `${v}%` }} />
                 </div>
                 <p className="mt-0.5 text-[10px] text-muted-foreground">{d}</p>
               </div>
@@ -198,7 +198,7 @@ export default function AdminAnalyticsPage() {
               ["4", "White-label storefronts", "₹999 / shop / mo"],
             ].map(([n, t, v]) => (
               <div key={n} className="flex items-start gap-2.5 rounded-xl bg-muted p-2.5">
-                <span className="num flex h-6 w-6 shrink-0 items-center justify-center rounded-full brand-gradient text-[11px] font-bold text-white">{n}</span>
+                <span className="num flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-foreground text-[11px] font-bold text-background">{n}</span>
                 <div className="min-w-0"><p className="text-[13px] font-semibold leading-tight">{t}</p><p className="num text-[11px] text-brand">{v}</p></div>
               </div>
             ))}

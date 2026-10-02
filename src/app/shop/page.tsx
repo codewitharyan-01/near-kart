@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { AlertTriangle, Banknote, IndianRupee, Package, PackageX, Star, TrendingUp } from "lucide-react";
 import { useApp } from "@/store/useApp";
 import { Badge, Button, EmptyState, StatCard } from "@/components/ui/base";
+import { SmartImage } from "@/components/ui/smart-image";
+import { shopImage } from "@/lib/images";
 import { inr, timeAgo } from "@/lib/utils";
 
 export default function ShopHome() {
@@ -54,21 +56,21 @@ export default function ShopHome() {
       {newOrders.map((o) => (
         <motion.div
           key={o.id}
-          initial={{ scale: 0.97, opacity: 0, y: -8 }}
-          animate={{ scale: [0.97, 1.015, 1], opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="rounded-2xl border-2 border-brand bg-brand-softer p-4 shadow-lg ring-4 ring-brand/10"
+          initial={{ scale: 0.98, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.35 }}
+          className="rounded-2xl border-2 border-foreground bg-card p-4 shadow-lift"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-2 font-display text-lg font-extrabold text-brand">
-              🔔 New order {o.code} <span className="num text-sm font-bold text-foreground">{inr(o.itemTotal)}</span>
+            <p className="flex items-center gap-2 text-lg font-bold tracking-tight">
+              New order <span className="num text-brand">{o.code}</span> <span className="num text-sm font-bold text-foreground">{inr(o.itemTotal)}</span>
             </p>
             <Badge tone="accent"><TimerPill placedAt={o.placedAt} /></Badge>
           </div>
           <ul className="mt-3 space-y-1 text-sm">
             {o.items.map((i) => (
               <li key={i.productId} className="flex items-center gap-2">
-                <span>{i.emoji}</span><span className="flex-1">{i.name} <span className="text-muted-foreground">· {i.packSize}</span></span>
+                <span className="flex-1">{i.name} <span className="text-muted-foreground">· {i.packSize}</span></span>
                 <span className="num font-bold">×{i.qty}</span>
               </li>
             ))}
@@ -111,7 +113,7 @@ export default function ShopHome() {
                 <div key={o.id} className="flex items-center gap-3 py-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="num text-sm font-bold">{o.code} <span className="ml-1 font-normal text-muted-foreground">· {o.customerName.split(" ")[0]} · {o.address.area}</span></p>
-                    <p className="truncate text-xs text-muted-foreground">{o.items.map((i) => `${i.emoji}×${i.qty}`).join(" ")} · {timeAgo(o.placedAt)}</p>
+                    <p className="truncate text-xs text-muted-foreground">{o.items.map((i) => `${i.name} ×${i.qty}`).join(" ")} · {timeAgo(o.placedAt)}</p>
                   </div>
                   <Badge tone={o.status === "DELIVERED" ? "brand" : ["CANCELLED", "REJECTED"].includes(o.status) ? "danger" : "accent"}>
                     {o.status.replaceAll("_", " ").toLowerCase()}

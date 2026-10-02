@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bike, Coins, Wallet } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle } from "@/components/brand/shell";
+import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
 import { Badge } from "@/components/ui/base";
 import { useApp } from "@/store/useApp";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ export default function RiderLayout({ children }: LayoutProps<"/rider">) {
 
   return (
     <AppReady>
+      <LocationGate role="rider" />
       <div className="mx-auto flex min-h-screen w-full max-w-md flex-col border-x bg-background">
         {/* top bar */}
         <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b bg-background/90 px-4 backdrop-blur-lg">

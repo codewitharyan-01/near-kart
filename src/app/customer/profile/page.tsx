@@ -26,7 +26,7 @@ export default function ProfilePage() {
     <div className="space-y-5">
       {/* identity card */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card-surface overflow-hidden">
-        <div className="brand-gradient h-16" />
+        <div className="bg-foreground h-16" />
         <div className="-mt-8 px-4 pb-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-card bg-gradient-to-br from-amber-400 to-orange-600 text-2xl font-extrabold text-white shadow-md">
             AS

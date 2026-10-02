@@ -7,6 +7,8 @@ import { Bike, ChevronLeft, CircleHelp, Flag, MessageSquareWarning, Phone } from
 import { useApp } from "@/store/useApp";
 import { Badge, Button, EmptyState, Stars } from "@/components/ui/base";
 import { Dialog } from "@/components/ui/overlays";
+import { SmartImage } from "@/components/ui/smart-image";
+import { productImage } from "@/lib/images";
 import { clockTime, inr } from "@/lib/utils";
 import type { Order } from "@/types";
 
@@ -29,6 +31,7 @@ export default function TrackOrderPage({ params }: { params: Promise<{ id: strin
   const order = useApp((s) => s.orders.find((o) => o.id === id));
   const shops = useApp((s) => s.shops);
   const riders = useApp((s) => s.riders);
+  const products = useApp((s) => s.products);
   const rateOrder = useApp((s) => s.rateOrder);
   const cancelOrder = useApp((s) => s.cancelOrder);
   const addDispute = useApp((s) => s.addDispute);
@@ -109,7 +112,7 @@ export default function TrackOrderPage({ params }: { params: Promise<{ id: strin
       {!dead ? (
         <div className="card-surface p-4">
           <div className="h-1.5 w-full rounded-full bg-muted">
-            <motion.div className="h-full brand-gradient rounded-full" animate={{ width: `${progress}%` }} transition={{ type: "spring", stiffness: 60, damping: 18 }} />
+            <motion.div className="h-full bg-foreground rounded-full" animate={{ width: `${progress}%` }} transition={{ type: "spring", stiffness: 60, damping: 18 }} />
           </div>
           <ol className="mt-4 space-y-3">
             {STEPS.map((s, i) => {
@@ -117,8 +120,8 @@ export default function TrackOrderPage({ params }: { params: Promise<{ id: strin
               const current = i === stepIdx;
               return (
                 <li key={s.id} className="flex items-center gap-3">
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm transition-all ${done ? "brand-gradient text-white" : "bg-muted text-muted-foreground"} ${current ? "pulse-ring" : ""}`}>
-                    {done ? "✓" : s.emoji}
+                  <div className={`num flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all ${done ? "bg-foreground text-background" : "bg-muted text-muted-foreground"} ${current ? "pulse-ring" : ""}`}>
+                    {done ? "✓" : i + 1}
                   </div>
                   <div className="flex-1">
                     <p className={`text-sm font-semibold ${current ? "text-brand" : done ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</p>
@@ -171,14 +174,17 @@ export default function TrackOrderPage({ params }: { params: Promise<{ id: strin
       <div className="card-surface p-4">
         <p className="mb-2 text-sm font-bold">{order.items.length} items</p>
         <ul className="space-y-1.5">
-          {order.items.map((i) => (
-            <li key={i.productId} className="flex items-center gap-2 text-sm">
-              <span className="text-lg">{i.emoji}</span>
-              <span className="flex-1 truncate">{i.name} <span className="text-muted-foreground">· {i.packSize}</span></span>
-              <span className="num text-muted-foreground">×{i.qty}</span>
-              <span className="num w-14 text-right font-semibold">{inr(i.price * i.qty)}</span>
-            </li>
-          ))}
+          {order.items.map((i) => {
+            const p = products.find((x) => x.id === i.productId);
+            return (
+              <li key={i.productId} className="flex items-center gap-2 text-sm">
+                <SmartImage src={productImage(p ?? { name: i.name, brand: "", category: "" })} alt={i.name} seed={i.productId} className="h-9 w-9 rounded-lg object-cover" />
+                <span className="flex-1 truncate">{i.name} <span className="text-muted-foreground">· {i.packSize}</span></span>
+                <span className="num text-muted-foreground">×{i.qty}</span>
+                <span className="num w-14 text-right font-semibold">{inr(i.price * i.qty)}</span>
+              </li>
+            );
+          })}
         </ul>
         <div className="mt-3 space-y-1 border-t pt-2 text-xs text-muted-foreground">
           <div className="flex justify-between"><span>Items</span><span className="num">{inr(order.itemTotal)}</span></div>

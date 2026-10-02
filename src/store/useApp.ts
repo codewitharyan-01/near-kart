@@ -68,9 +68,11 @@ interface AppState {
   customer: Customer;
   simAuto: boolean;
   onboarded: { shop: boolean; rider: boolean };
+  locationAsked: boolean;
 
   setRole: (r: Role) => void;
   setArea: (id: string) => void;
+  setLocationAsked: (v: boolean) => void;
 
   addToCart: (productId: string, qty?: number) => { ok: boolean; reason?: string; shopName?: string };
   setQty: (productId: string, qty: number) => void;
@@ -133,6 +135,7 @@ const seedState = () => ({
   customer: DEMO_CUSTOMER,
   simAuto: true,
   onboarded: { shop: true, rider: true },
+  locationAsked: false,
 });
 
 function areaLoc(areaName: string) {
@@ -255,6 +258,7 @@ export const useApp = create<AppState>()(
 
         setRole: (role) => set({ role }),
         setArea: (areaId) => set({ areaId }),
+        setLocationAsked: (locationAsked) => set({ locationAsked }),
 
         addToCart: (productId, qty = 1) => {
           const s = get();
