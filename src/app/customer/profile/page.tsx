@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Copy, Flame, Gift, MapPin, Share2, Users } from "lucide-react";
 import { useApp } from "@/store/useApp";
-import { ThemeToggle } from "@/components/brand/shell";
+
 import { Badge, Button, Progress, SectionTitle, Switch } from "@/components/ui/base";
 import { inr } from "@/lib/utils";
 
@@ -123,7 +123,6 @@ export default function ProfilePage() {
               <p className="text-sm font-semibold">Dark mode</p>
               <p className="text-xs text-muted-foreground">Easier on the eyes at night</p>
             </div>
-            <ThemeToggle />
           </div>
           <div className="flex items-center justify-between p-4">
             <div>

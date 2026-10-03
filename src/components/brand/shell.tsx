@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Check, Crosshair, MapPin, Moon, Repeat, Sun, Trash2, Zap, ZapOff } from "lucide-react";
+import {
+  Banknote, Bell, Bike, Check, Crosshair, Gift, MapPin, Package, Repeat,
+  ShieldCheck, ShoppingBag, Trash2, Zap, ZapOff,
+} from "lucide-react";
 import { useApp } from "@/store/useApp";
 import { Button } from "@/components/ui/base";
 import { Dialog } from "@/components/ui/overlays";
@@ -33,23 +35,6 @@ export function Logo({ size = 34, withWordmark = true, className }: { size?: num
   );
 }
 
-/* ------------------------------ Theme toggle ---------------------------- */
-export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return <span className="h-9 w-9" />;
-  return (
-    <button
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      aria-label="Toggle dark mode"
-      className="flex h-9 w-9 items-center justify-center rounded-full border bg-card transition-colors hover:bg-muted"
-    >
-      {resolvedTheme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-    </button>
-  );
-}
-
 /* ------------------------------ Demo banner ----------------------------- */
 export function DemoBanner() {
   const simAuto = useApp((s) => s.simAuto);
@@ -72,39 +57,122 @@ export function DemoBanner() {
 }
 
 /* ---------------------------- Notifications ----------------------------- */
+const KIND_ICON: Record<string, typeof Bell> = {
+  order: ShoppingBag,
+  stock: Package,
+  rider: Bike,
+  payout: Banknote,
+  trust: ShieldCheck,
+  growth: Gift,
+};
+
 export function NotificationsBell() {
   const notifications = useApp((s) => s.notifications);
   const markRead = useApp((s) => s.markNotificationsRead);
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"all" | "orders" | "alerts">("all");
+  const ref = useRef<HTMLDivElement>(null);
   const unread = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (open && ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  const filtered = notifications.filter((n) =>
+    tab === "all" ? true : tab === "orders" ? n.kind === "order" || n.kind === "payout" : n.kind !== "order" && n.kind !== "payout",
+  );
+
   return (
-    <>
-      <button onClick={() => { setOpen(true); markRead(); }} aria-label={`Notifications (${unread} unread)`} className="relative flex h-9 w-9 items-center justify-center rounded-full border bg-card transition-colors hover:bg-muted">
-        <Bell size={15} />
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => { setOpen(!open); if (!open) markRead(); }}
+        aria-label={`Notifications (${unread} unread)`}
+        className={cn(
+          "relative flex h-9 w-9 items-center justify-center rounded-full border bg-card transition-all hover:bg-muted",
+          unread > 0 && !open && "border-brand/40",
+        )}
+      >
+        <Bell size={15} className={unread > 0 ? "text-brand" : ""} />
         {unread > 0 && (
-          <span className="num absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
       </button>
-      <Dialog open={open} onClose={() => setOpen(false)} title="Activity">
-        {notifications.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">No activity yet. Place an order to see live events.</p>
-        ) : (
-          <ul className="space-y-2">
-            {notifications.slice(0, 15).map((n) => (
-              <li key={n.id} className={cn("rounded-xl border p-3", n.read ? "opacity-60" : "")}>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold">{n.title}</p>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">{timeAgo(n.at)}</span>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.98 }}
+            transition={{ duration: 0.16 }}
+            className="absolute right-0 top-11 z-110 w-[340px] overflow-hidden rounded-2xl border bg-card shadow-lift"
+            role="dialog"
+            aria-label="Notifications panel"
+          >
+            <div className="flex items-center justify-between border-b px-4 py-3">
+              <p className="text-sm font-bold">Notifications</p>
+              {unread > 0 && <span className="num rounded-full bg-danger px-1.5 py-0.5 text-[10px] font-bold text-white">{unread} new</span>}
+            </div>
+            <div className="flex gap-1 border-b px-3 py-2">
+              {(["all", "orders", "alerts"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={cn(
+                    "rounded-full px-3 py-1 text-[11px] font-bold capitalize transition",
+                    tab === t ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <div className="max-h-[380px] overflow-y-auto">
+              {filtered.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 py-10 text-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-muted"><Bell size={16} className="text-muted-foreground" /></span>
+                  <p className="text-sm font-semibold">All caught up</p>
+                  <p className="max-w-[220px] text-xs text-muted-foreground">Order updates, stock alerts and payout news will land here.</p>
                 </div>
-                <p className="text-xs text-muted-foreground">{n.body}</p>
-              </li>
-            ))}
-          </ul>
+              ) : (
+                <ul className="divide-y">
+                  {filtered.slice(0, 18).map((n) => {
+                    const Icon = KIND_ICON[n.kind] ?? Bell;
+                    return (
+                      <li key={n.id} className={cn("flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50", !n.read && "bg-brand-softer/60")}>
+                        <span className={cn(
+                          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+                          n.kind === "order" || n.kind === "payout" ? "bg-brand-soft text-brand" : n.kind === "trust" ? "bg-danger-soft text-danger" : "bg-accent-soft text-accent",
+                        )}>
+                          <Icon size={14} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="flex items-center gap-1.5 text-[13px] font-semibold leading-tight">
+                            {n.title}
+                            {!n.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />}
+                          </p>
+                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{n.body}</p>
+                          <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">{timeAgo(n.at)}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+            <div className="border-t px-4 py-2.5 text-center">
+              <button onClick={() => setOpen(false)} className="text-xs font-bold text-brand hover:underline">Close panel</button>
+            </div>
+          </motion.div>
         )}
-      </Dialog>
-    </>
+      </AnimatePresence>
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bike, Coins, Wallet } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
+import { NotificationsBell, Logo, AppReady, LocationGate } from "@/components/brand/shell";
 import { Badge } from "@/components/ui/base";
 import { useApp } from "@/store/useApp";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,6 @@ export default function RiderLayout({ children }: LayoutProps<"/rider">) {
           <div className="flex items-center gap-2">
             <Badge tone={me.online ? "brand" : "neutral"}>{me.online ? "🟢 Online" : "⚪ Offline"}</Badge>
             <NotificationsBell />
-            <ThemeToggle />
           </div>
         </header>
 

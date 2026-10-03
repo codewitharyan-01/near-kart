@@ -1,6 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Clock3, Search, Sparkles, TrendingUp, X } from "lucide-react";
 import { CATEGORIES } from "@/data/categories";
 import { useApp, selectUserLoc } from "@/store/useApp";
@@ -14,11 +17,12 @@ import { inr } from "@/lib/utils";
 const TRENDING = ["milk", "bread", "eggs", "atta", "cold drink", "maggi", "tomato", "notebook", "earphones"];
 const RECENT_KEY = "nearkart-recents";
 
-export default function SearchPage() {
+function SearchPageInner() {
   const products = useApp((s) => s.products);
   const shops = useApp((s) => s.shops);
   const userLoc = useApp(selectUserLoc);
-  const [q, setQ] = useState("");
+  const params = useSearchParams();
+  const [q, setQ] = useState(params.get("q") ?? "");
   const [recent, setRecent] = useState<string[]>([]);
   const [quick, setQuick] = useState<Canonical | null>(null);
   const [sort, setSort] = useState<"nearest" | "price">("nearest");
@@ -167,5 +171,13 @@ export default function SearchPage() {
       <ProductQuickView canonical={quick} onClose={() => setQuick(null)} />
       <div className="h-2" />
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-7xl px-6 py-10 text-sm text-muted-foreground">Loading search…</div>}>
+      <SearchPageInner />
+    </Suspense>
   );
 }

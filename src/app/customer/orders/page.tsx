@@ -7,7 +7,8 @@ import { SmartImage } from "@/components/ui/smart-image";
 import { productImage, shopImage } from "@/lib/images";
 import { clockTime, dateShort, inr } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Radio } from "lucide-react";
+import { Radio, Layers } from "lucide-react";
+import type { Order } from "@/types";
 
 const LIVE = ["PLACED", "ACCEPTED", "PACKING", "READY_FOR_PICKUP", "RIDER_ASSIGNED", "PICKED_UP", "OUT_FOR_DELIVERY"];
 
@@ -15,6 +16,8 @@ export default function OrdersPage() {
   const orders = useApp((s) => s.orders);
   const shops = useApp((s) => s.shops);
   const mine = orders.filter((o) => o.customerId === "c1");
+  const groups = new Map<string, Order[]>();
+  for (const o of mine) if (o.groupCode) groups.set(o.groupCode, [...(groups.get(o.groupCode) ?? []), o]);
   const live = mine.filter((o) => LIVE.includes(o.status));
   const past = mine.filter((o) => !LIVE.includes(o.status)).sort((a, b) => b.placedAt - a.placedAt);
 
@@ -22,7 +25,7 @@ export default function OrdersPage() {
     s === "DELIVERED" ? "brand" : s === "CANCELLED" || s === "REJECTED" ? "danger" : "accent";
 
   return (
-    <div className="space-y-5">
+    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6">
       <SectionTitle title="Your orders" sub="Groceries from your neighbourhood, on record" />
 
       {mine.length === 0 && <EmptyState emoji="🧾" title="No orders yet" body="Your order history will appear here." action={<Link href="/customer"><Button>Start shopping</Button></Link>} />}
@@ -45,6 +48,9 @@ export default function OrdersPage() {
                       <div className="flex items-center gap-2">
                         <p className="truncate text-sm font-bold">{shop?.name}</p>
                         <span className="num text-[10px] text-muted-foreground">{o.code}</span>
+                        {o.groupCode && (
+                          <span className="ml-auto flex items-center gap-1 rounded-full bg-accent-soft px-1.5 py-0.5 text-[9px] font-bold text-accent"><Layers size={9} /> {o.groupCode} · {(groups.get(o.groupCode)?.length ?? 1)} stores</span>
+                        )}
                       </div>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">{o.items.map((i) => `${i.name} ×${i.qty}`).join(" · ")}</p>
                     </div>
@@ -75,6 +81,9 @@ export default function OrdersPage() {
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-bold">{shop?.name}</p>
                       <Badge tone={toneFor(o.status)}>{o.status.toLowerCase()}</Badge>
+                    {o.groupCode && (
+                      <span className="flex items-center gap-1 rounded-full bg-accent-soft px-1.5 py-0.5 text-[9px] font-bold text-accent"><Layers size={9} /> {(groups.get(o.groupCode)?.length ?? 1)}-store</span>
+                    )}
                     </div>
                     <p className="text-xs text-muted-foreground">{dateShort(o.placedAt)} · {clockTime(o.placedAt)} · {o.items.length} items</p>
                     {o.rating ? <p className="mt-0.5 text-xs text-amber-500">{"★".repeat(o.rating)} <span className="text-muted-foreground">your rating</span></p> : null}

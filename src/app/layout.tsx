@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { DemoBanner, RoleSwitcher, SimEngine, SyncBridge } from "@/components/brand/shell";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,16 +15,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geist.variable} h-full antialiased`}>
+    <html lang="en" className={`${geist.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-          <DemoBanner />
-          <SimEngine />
-          <SyncBridge />
-          {children}
-          <RoleSwitcher />
-          <Toaster />
-        </ThemeProvider>
+        <DemoBanner />
+        <SimEngine />
+        <SyncBridge />
+        {children}
+        <RoleSwitcher />
+        <Toaster />
       </body>
     </html>
   );

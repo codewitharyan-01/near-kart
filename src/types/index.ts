@@ -138,6 +138,7 @@ export interface TimelineEvent {
 export interface Order {
   id: string;
   code: string;
+  groupCode?: string;
   customerId: string;
   customerName: string;
   customerPhone: string;
@@ -147,6 +148,7 @@ export interface Order {
   items: OrderItem[];
   itemTotal: number;
   deliveryFee: number;
+  multiStoreFee: number;
   couponDiscount: number;
   coinDiscount: number;
   tip: number;

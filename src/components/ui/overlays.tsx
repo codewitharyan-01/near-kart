@@ -31,12 +31,16 @@ export function Dialog({ open, onClose, title, children, wide }: { open: boolean
             )}
           >
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted sm:hidden" />
+            <button
+              onClick={onClose}
+              aria-label="Close dialog"
+              className="absolute right-3.5 top-3.5 z-10 flex h-8 w-8 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-sm transition hover:text-foreground hover:shadow"
+            >
+              <X size={14} />
+            </button>
             {title && (
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h3 className="text-lg font-bold">{title}</h3>
-                <button onClick={onClose} aria-label="Close dialog" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted">
-                  <X size={16} />
-                </button>
+              <div className="mb-4 flex items-center justify-between gap-3 pr-9">
+                <h3 className="text-lg font-bold tracking-tight">{title}</h3>
               </div>
             )}
             {children}

@@ -11,7 +11,7 @@ import { RIDERS } from "@/data/riders";
 import { DEMO_CUSTOMER, OTHER_CUSTOMERS } from "@/data/customers";
 import { SEED_ORDERS } from "@/data/orders";
 import { OFFERS, SEED_TRANSACTIONS, SEED_DISPUTES, SEED_RIDER_PAYOUTS } from "@/data/misc";
-import { computeEta, coinsFor, deliveryFeeFor, fraudRisk, matchRiders, riderPayFor } from "@/lib/algorithms";
+import { computeEta, coinsFor, groupEta, multiStoreFees, CART_RULES, fraudRisk, matchRiders, riderPayFor } from "@/lib/algorithms";
 import { haversineKm, otp4, orderCode, uid } from "@/lib/utils";
 
 export const MIN_ORDER = 100;
@@ -46,6 +46,13 @@ export interface PlaceOrderArgs {
   payment: Order["payment"];
   tip: number;
   instructions?: string;
+}
+
+export interface CartValidation {
+  ok: boolean;
+  reason?: string;
+  shopId?: string;
+  needed?: number;
 }
 
 interface AppState {
@@ -83,7 +90,8 @@ interface AppState {
   removeCoupon: (code: string) => void;
   toggleUseCoins: () => void;
 
-  placeOrder: (args: PlaceOrderArgs) => Order | null;
+  validateCart: () => CartValidation;
+  placeOrder: (args: PlaceOrderArgs) => Order[];
 
   shopAccept: (orderId: string) => void;
   shopReject: (orderId: string, reason: string, item?: string) => void;
@@ -265,12 +273,13 @@ export const useApp = create<AppState>()(
           const p = s.products.find((x) => x.id === productId);
           if (!p) return { ok: false, reason: "Product not found" };
           if (p.status !== "active" || p.stock <= 0) return { ok: false, reason: "Out of stock" };
-          if (s.cart.shopId && s.cart.shopId !== p.shopId && Object.keys(s.cart.items).length > 0) {
-            return { ok: false, reason: "other-shop", shopName: s.shops.find((x) => x.id === s.cart.shopId)?.name };
-          }
           const cur = s.cart.items[productId] ?? 0;
-          if (cur + qty > p.stock) return { ok: false, reason: `Only ${p.stock} left in stock` };
-          set((st) => ({ cart: { shopId: p.shopId, items: { ...st.cart.items, [productId]: cur + qty } } }));
+          const next = cur + qty;
+          if (next > p.stock) return { ok: false, reason: `Only ${p.stock} left in stock` };
+          const items = { ...s.cart.items };
+          if (next <= 0) delete items[productId];
+          else items[productId] = next;
+          set({ cart: { shopId: Object.keys(items).length ? p.shopId : null, items } });
           return { ok: true };
         },
         setQty: (productId, qty) => {
@@ -305,79 +314,129 @@ export const useApp = create<AppState>()(
         removeCoupon: (code) => set((s) => ({ appliedCoupons: s.appliedCoupons.filter((c) => c !== code) })),
         toggleUseCoins: () => set((s) => ({ useCoins: !s.useCoins })),
 
+        validateCart: () => {
+          const s = get();
+          const entries = Object.entries(s.cart.items);
+          if (entries.length === 0 || !s.cart.shopId) return { ok: false, reason: "empty" };
+          const byShop = new Map<string, number>();
+          for (const [pid, qty] of entries) {
+            const p = s.products.find((x) => x.id === pid);
+            if (p) byShop.set(p.shopId, (byShop.get(p.shopId) ?? 0) + p.price * qty);
+          }
+          const overall = [...byShop.values()].reduce((a, b) => a + b, 0);
+          if (overall < CART_RULES.overallMin) return { ok: false, reason: "overall", needed: CART_RULES.overallMin - overall };
+          if (byShop.size === 1) {
+            if (overall < CART_RULES.singleMin) return { ok: false, reason: "single", shopId: [...byShop.keys()][0], needed: CART_RULES.singleMin - overall };
+          } else {
+            for (const [sid, v] of byShop) {
+              if (v < CART_RULES.multiPerShopMin) return { ok: false, reason: "multi", shopId: sid, needed: CART_RULES.multiPerShopMin - v };
+            }
+          }
+          return { ok: true };
+        },
+
         placeOrder: ({ address, payment, tip, instructions }) => {
           const s = get();
-          if (!s.cart.shopId || Object.keys(s.cart.items).length === 0) return null;
-          const shop = s.shops.find((x) => x.id === s.cart.shopId);
-          if (!shop) return null;
-          const items: OrderItem[] = Object.entries(s.cart.items).map(([pid, qty]) => {
-            const p = s.products.find((x) => x.id === pid)!;
-            return { productId: p.id, name: p.name, emoji: p.emoji, packSize: p.packSize, price: p.price, qty };
-          });
-          const itemTotal = items.reduce((t, i) => t + i.price * i.qty, 0);
-          if (itemTotal < MIN_ORDER) return null;
+          if (Object.keys(s.cart.items).length === 0) return [];
+          const validation = get().validateCart();
+          if (!validation.ok) return [];
 
-          let deliveryFee = deliveryFeeFor(itemTotal);
+          /* group the basket by shop — one sub-order per store */
+          const byShop = new Map<string, OrderItem[]>();
+          for (const [pid, qty] of Object.entries(s.cart.items)) {
+            const p = s.products.find((x) => x.id === pid)!;
+            const item: OrderItem = { productId: p.id, name: p.name, emoji: p.emoji, packSize: p.packSize, price: p.price, qty };
+            byShop.set(p.shopId, [...(byShop.get(p.shopId) ?? []), item]);
+          }
+          const shopIds = [...byShop.keys()];
+          const overall = [...byShop.values()].reduce((t, items) => t + items.reduce((a, i) => a + i.price * i.qty, 0), 0);
+          const fees = multiStoreFees(shopIds.length, overall);
+
+          /* coupons apply to the group; coins redeem against the group */
           let couponDiscount = 0;
           for (const code of s.appliedCoupons) {
             const offer = s.offers.find((o) => o.code === code && o.active);
-            if (!offer || itemTotal < offer.minOrder) continue;
-            if (offer.type === "flat") couponDiscount += offer.value;
-            else deliveryFee = 0;
+            if (offer && overall >= offer.minOrder) {
+              if (offer.type === "flat") couponDiscount += offer.value;
+              else fees.total = 0;
+            }
           }
           const coinDiscount = s.useCoins ? Math.min(s.loyalty.coins, 50) : 0;
-          const total = itemTotal + deliveryFee - couponDiscount - coinDiscount + tip;
 
           const risk = fraudRisk({
             payment,
-            total,
+            total: overall,
             isNewCustomer: false,
-            areaMatch: haversineKm(shop.location, areaLoc(address.area)) <= shop.radiusKm,
+            areaMatch: shopIds.every((sid) => {
+              const shop = s.shops.find((x) => x.id === sid);
+              return shop ? haversineKm(shop.location, areaLoc(address.area)) <= shop.radiusKm : false;
+            }),
             recentCancels: s.orders.filter((o) => o.customerId === s.customer.id && ["CANCELLED", "REJECTED"].includes(o.status) && Date.now() - o.placedAt < 7 * 86400000).length,
           });
 
           const onlineRiders = s.riders.filter((r) => r.online).length;
-          const eta = computeEta(shop, areaLoc(address.area), onlineRiders);
-          let code = orderCode();
-          while (s.orders.some((o) => o.code === code)) code = orderCode();
+          let groupCode = `NK-G${Math.floor(1000 + Math.random() * 9000)}`;
+          while (s.orders.some((o) => o.groupCode === groupCode)) groupCode = `NK-G${Math.floor(1000 + Math.random() * 9000)}`;
+          const usedCodes = new Set(s.orders.map((o) => o.code));
 
-          const order: Order = {
-            id: uid("o"),
-            code,
-            customerId: s.customer.id,
-            customerName: s.customer.name,
-            customerPhone: s.customer.phone,
-            address: { ...address, instructions: instructions || address.instructions },
-            shopId: shop.id,
-            items,
-            itemTotal,
-            deliveryFee,
-            couponDiscount,
-            coinDiscount,
-            tip,
-            total,
-            payment,
-            paymentRisk: risk.level === "review" ? "review" : "normal",
-            status: "PLACED",
-            placedAt: Date.now(),
-            lastStatusAt: Date.now(),
-            timeline: [{ status: "PLACED", at: Date.now(), by: "customer" }],
-            otpPickup: otp4(),
-            otpDelivery: otp4(),
-            etaMin: eta,
-            instructions,
-          };
+          const created: Order[] = shopIds.map((sid, idx) => {
+            const shop = s.shops.find((x) => x.id === sid)!;
+            const items = byShop.get(sid)!;
+            const itemTotal = items.reduce((t, i) => t + i.price * i.qty, 0);
+            /* fee allocation: base on first store, extra-shop fee on the following ones */
+            const deliveryFee = idx === 0 ? fees.baseFee : 0;
+            const multiStoreFee = idx === 0 ? 0 : fees.extraShopFees / (shopIds.length - 1);
+            /* discounts land on the first sub-order to keep the ledger exact */
+            const share = itemTotal / overall;
+            const oCoupon = idx === 0 ? couponDiscount : 0;
+            const oCoins = Math.round(coinDiscount * share * 100) / 100;
+            let code = orderCode();
+            while (usedCodes.has(code)) code = orderCode();
+            usedCodes.add(code);
+            return {
+              id: uid("o"),
+              code,
+              groupCode: shopIds.length > 1 ? groupCode : undefined,
+              customerId: s.customer.id,
+              customerName: s.customer.name,
+              customerPhone: s.customer.phone,
+              address: { ...address, instructions: instructions || address.instructions },
+              shopId: sid,
+              items,
+              itemTotal,
+              deliveryFee,
+              multiStoreFee: Math.round(multiStoreFee * 100) / 100,
+              couponDiscount: oCoupon,
+              coinDiscount: oCoins,
+              tip: idx === 0 ? tip : 0,
+              total: Math.round((itemTotal + deliveryFee + multiStoreFee - oCoupon - oCoins + (idx === 0 ? tip : 0)) * 100) / 100,
+              payment,
+              paymentRisk: risk.level === "review" ? "review" : "normal",
+              status: "PLACED" as const,
+              placedAt: Date.now(),
+              lastStatusAt: Date.now(),
+              timeline: [{ status: "PLACED", at: Date.now(), by: "customer" }],
+              otpPickup: otp4(),
+              otpDelivery: otp4(),
+              etaMin: computeEta(shop, areaLoc(address.area), onlineRiders),
+              instructions,
+            };
+          });
+
+          const eta = groupEta(created.map((o) => o.etaMin));
+          for (const o of created) {
+            notify({ role: "shop", kind: "order", title: "New order received!", body: `${o.code}${shopIds.length > 1 ? ` (part of ${groupCode})` : ""} • ₹${o.itemTotal} • ${o.items.length} items` });
+          }
+          notify({ role: "customer", kind: "order", title: shopIds.length > 1 ? `Order placed across ${shopIds.length} stores` : "Order placed", body: `${groupCode ?? created[0].code} • arriving in ~${eta} min` });
 
           set((st) => ({
-            orders: [order, ...st.orders],
+            orders: [...created, ...st.orders],
             cart: { shopId: null, items: {} },
             appliedCoupons: [],
             useCoins: false,
             loyalty: coinDiscount > 0 ? { ...st.loyalty, coins: st.loyalty.coins - coinDiscount } : st.loyalty,
           }));
-          notify({ role: "shop", kind: "order", title: "New order received!", body: `${order.code} • ₹${order.total} • ${items.length} items` });
-          notify({ role: "customer", kind: "order", title: "Order placed", body: `${shop.name} • arriving in ~${eta} min` });
-          return order;
+          return created;
         },
 
         shopAccept: (orderId) => advance(orderId),

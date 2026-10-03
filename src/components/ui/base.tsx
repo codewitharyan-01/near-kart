@@ -176,7 +176,6 @@ export function Stepper({ qty, onChange, max = 99, small }: { qty: number; onCha
     </div>
   );
 }
-
 /* ------------------------------ Stars --------------------------------- */
 export function Stars({ value, size = 14, className }: { value: number; size?: number; className?: string }) {
   return (

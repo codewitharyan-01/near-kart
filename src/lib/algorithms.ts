@@ -107,3 +107,38 @@ export function coinsFor(orderTotal: number) {
 export function deliveryFeeFor(itemTotal: number) {
   return itemTotal >= 299 ? 0 : 25;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Multi-store economics — grow baskets without losing money         */
+/* ------------------------------------------------------------------ */
+export const CART_RULES = {
+  singleMin: 100, // one shop: full ₹100 basket minimum
+  multiPerShopMin: 50, // multi-shop: ₹50 per shop keeps pickup economics alive
+  overallMin: 100,
+  extraShopFee: 15, // rider handles an extra pickup — paid, not absorbed
+  singleFreeAbove: 299,
+  multiFreeAbove: 499,
+} as const;
+
+export interface FeeBreakdown {
+  baseFee: number;
+  extraShopFees: number;
+  total: number;
+  free: boolean;
+}
+
+export function multiStoreFees(shopCount: number, itemTotal: number): FeeBreakdown {
+  if (shopCount <= 1) {
+    const free = itemTotal >= CART_RULES.singleFreeAbove;
+    return { baseFee: free ? 0 : 25, extraShopFees: 0, total: free ? 0 : 25, free };
+  }
+  const free = itemTotal >= CART_RULES.multiFreeAbove;
+  const extraShopFees = free ? 0 : (shopCount - 1) * CART_RULES.extraShopFee;
+  return { baseFee: free ? 0 : 25, extraShopFees, total: (free ? 0 : 25) + extraShopFees, free };
+}
+
+/** Group ETA: slowest shop plus ~8 min per additional pickup. */
+export function groupEta(etas: number[]) {
+  if (etas.length === 0) return 25;
+  return Math.max(...etas) + (etas.length - 1) * 8;
+}

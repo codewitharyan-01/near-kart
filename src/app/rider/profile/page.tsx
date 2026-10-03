@@ -2,7 +2,7 @@
 
 import { Bike, ShieldCheck, Star } from "lucide-react";
 import { useApp } from "@/store/useApp";
-import { ThemeToggle } from "@/components/brand/shell";
+
 import { Badge, Field, Input, Select, Stars, Switch } from "@/components/ui/base";
 import { inr } from "@/lib/utils";
 
@@ -66,7 +66,6 @@ export default function RiderProfilePage() {
           <p className="text-sm font-bold">Dark mode</p>
           <p className="text-xs text-muted-foreground">Comfortable night rides</p>
         </div>
-        <ThemeToggle />
       </div>
 
       <div className="card-surface p-4">

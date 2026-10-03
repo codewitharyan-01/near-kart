@@ -7,7 +7,7 @@ import {
   ArrowRight, BadgeCheck, Banknote, Clock3, Eye, MapPin, PackageCheck,
   Percent, ShieldCheck, ShoppingBag, Store, Truck, Users,
 } from "lucide-react";
-import { Logo, ThemeToggle } from "@/components/brand/shell";
+import { Logo } from "@/components/brand/shell";
 import { Button } from "@/components/ui/base";
 import { SmartImage } from "@/components/ui/smart-image";
 import { heroCollage } from "@/lib/images";
@@ -116,7 +116,7 @@ export default function LandingPage() {
     <div className="min-h-screen">
       {/* nav */}
       <header className="sticky top-0 z-50 border-b bg-background/90 backdrop-blur-lg">
-        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/"><Logo /></Link>
           <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex">
             <a href="#how" className="transition-colors hover:text-foreground">How it works</a>
@@ -125,14 +125,13 @@ export default function LandingPage() {
             <a href="#investors" className="transition-colors hover:text-foreground">Investors</a>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Link href="/customer"><Button size="sm">Launch Demo <ArrowRight size={14} /></Button></Link>
           </div>
         </nav>
       </header>
 
       {/* hero */}
-      <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
+      <section className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">Hyperlocal commerce network</p>
           <h1 className="mt-4 text-[2.6rem] font-bold leading-[1.04] tracking-[-0.03em] sm:text-6xl">
@@ -159,7 +158,7 @@ export default function LandingPage() {
 
       {/* brands + metrics strip */}
       <section className="border-y bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-7 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 border-b border-dashed pb-6 text-sm font-bold tracking-wide text-muted-foreground/70">
             <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">Real inventory from</span>
             <span>Amul</span><span>Britannia</span><span>Tata</span><span>Maggi</span><span>Colgate</span><span>boAt</span><span>Haldiram&apos;s</span>
@@ -186,7 +185,7 @@ export default function LandingPage() {
       </section>
 
       {/* problem */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
         <motion.div {...fadeUp} className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">The problem</p>
           <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-[2.6rem] sm:leading-[1.1]">
@@ -212,7 +211,7 @@ export default function LandingPage() {
 
       {/* how it works */}
       <section id="how" className="border-y bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
           <motion.div {...fadeUp} className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">The flywheel</p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Four steps. One loop. Compounding density.</h2>
@@ -230,7 +229,7 @@ export default function LandingPage() {
       </section>
 
       {/* modules */}
-      <section id="modules" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+      <section id="modules" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
         <motion.div {...fadeUp} className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">One platform, four experiences</p>
           <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Every side of the marketplace, fully working</h2>
@@ -260,7 +259,7 @@ export default function LandingPage() {
 
       {/* business model */}
       <section className="border-y bg-card">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <motion.div {...fadeUp}>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">Business model</p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Six revenue streams, one order</h2>
@@ -315,7 +314,7 @@ export default function LandingPage() {
       </section>
 
       {/* trust */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
         <motion.div {...fadeUp} className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">Trust & safety</p>
           <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Trust is the product</h2>
@@ -340,7 +339,7 @@ export default function LandingPage() {
 
       {/* investors / roadmap */}
       <section id="investors" className="border-t bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
           <motion.div {...fadeUp} className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand">Unicorn pathway</p>
             <h2 className="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Delivery is the wedge. The OS is the moat.</h2>
@@ -377,7 +376,7 @@ export default function LandingPage() {
 
       {/* footer */}
       <footer className="border-t bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <div>
               <Logo />

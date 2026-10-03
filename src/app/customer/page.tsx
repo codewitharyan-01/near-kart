@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { stagger } from "@/lib/motion";
 import { ChevronRight, Clock3, Crosshair, Flame, Search, TicketPercent } from "lucide-react";
 import { CATEGORIES } from "@/data/categories";
 import { AREAS } from "@/data/areas";
@@ -95,7 +96,7 @@ export default function CustomerHome() {
   const greeting = new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="space-y-7">
+    <motion.div variants={stagger} initial="hidden" animate="show" className="mx-auto max-w-7xl space-y-8 px-4 pt-5 sm:px-6">
       {/* location header */}
       <div className="flex items-center justify-between gap-3">
         <div>
@@ -220,6 +221,6 @@ export default function CustomerHome() {
 
       {/* quick view */}
       <ProductQuickView canonical={quick} onClose={() => setQuick(null)} />
-    </div>
+    </motion.div>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BarChart3, Gavel, LayoutDashboard, Package, ShieldCheck, Users } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
+import { NotificationsBell, Logo, AppReady, LocationGate } from "@/components/brand/shell";
 import { Badge } from "@/components/ui/base";
 import { useApp } from "@/store/useApp";
 import { cn } from "@/lib/utils";
@@ -73,7 +73,6 @@ export default function AdminLayout({ children }: LayoutProps<"/admin">) {
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" /> Live
               </span>
               <NotificationsBell />
-              <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 p-4 pb-24 sm:p-6 lg:pb-6">{children}</main>

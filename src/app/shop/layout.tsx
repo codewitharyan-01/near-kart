@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { Home, LayoutGrid, Package, Percent, ReceiptIndianRupee, Settings, ExternalLink } from "lucide-react";
-import { NotificationsBell, Logo, AppReady, ThemeToggle, LocationGate } from "@/components/brand/shell";
+import { NotificationsBell, Logo, AppReady, LocationGate } from "@/components/brand/shell";
 import { Badge } from "@/components/ui/base";
 import { SmartImage } from "@/components/ui/smart-image";
 import { useApp } from "@/store/useApp";
@@ -152,7 +152,6 @@ export default function ShopLayout({ children }: LayoutProps<"/shop">) {
                 {shop.verified ? "✓ Verified" : "Pending"}
               </Badge>
               <NotificationsBell />
-              <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 p-4 pb-24 sm:p-6 lg:pb-6">{children}</main>

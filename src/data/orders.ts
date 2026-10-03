@@ -86,6 +86,7 @@ export const SEED_ORDERS: Order[] = SEEDS.map((s, idx) => {
     items: oi,
     itemTotal: total0,
     deliveryFee,
+    multiStoreFee: 0,
     couponDiscount: 0,
     coinDiscount: 0,
     tip: 0,

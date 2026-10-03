@@ -1,53 +1,118 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, ReceiptText, Search, ShoppingBag, User } from "lucide-react";
-import { NotificationsBell, AppReady, ThemeToggle, LocationGate, ChangeLocationButton } from "@/components/brand/shell";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Home, ReceiptText, Search, ShoppingBag, TicketPercent, User, CircleHelp, Store } from "lucide-react";
+import { NotificationsBell, Logo, AppReady, LocationGate, ChangeLocationButton } from "@/components/brand/shell";
 import { cartCount, useApp } from "@/store/useApp";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/customer", label: "Home", icon: Home },
   { href: "/customer/search", label: "Search", icon: Search },
-  { href: "/customer/cart", label: "Cart", icon: ShoppingBag },
+  { href: "/customer/offers", label: "Offers", icon: TicketPercent },
   { href: "/customer/orders", label: "Orders", icon: ReceiptText },
   { href: "/customer/profile", label: "Profile", icon: User },
 ];
 
 export default function CustomerLayout({ children }: LayoutProps<"/customer">) {
   const pathname = usePathname();
+  const router = useRouter();
   const setRole = useApp((s) => s.setRole);
   const items = useApp((s) => s.cart.items);
   const count = cartCount(items);
+  const [q, setQ] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <AppReady>
       <LocationGate role="customer" />
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col">
-        {/* top bar */}
-        <header className="sticky top-0 z-50 border-b bg-background/92 backdrop-blur-lg">
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <Link href="/customer" className="shrink-0"><LogoMini /></Link>
-            <div className="min-w-0 flex-1"><ChangeLocationButton compact /></div>
-            <NotificationsBell />
-            <ThemeToggle />
-            <Link href="/customer/cart" aria-label={`Cart with ${count} items`} className="relative flex h-9 w-9 items-center justify-center rounded-full border bg-card transition-colors hover:bg-muted">
-              <ShoppingBag size={15} />
-              {count > 0 && (
-                <span className="num absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-bold text-background">
-                  {count}
-                </span>
-              )}
-            </Link>
+      <div className="flex min-h-screen flex-col">
+        {/* full-width site header */}
+        <header className={cn("sticky top-0 z-50 border-b bg-background/95 backdrop-blur-lg transition-shadow", scrolled && "shadow-soft")}>
+          <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
+            <Link href="/customer" className="shrink-0"><Logo /></Link>
+            <div className="hidden lg:block"><ChangeLocationButton /></div>
+
+            {/* inline search */}
+            <form
+              className="relative hidden max-w-md flex-1 md:block lg:mx-4"
+              onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/customer/search?q=${encodeURIComponent(q.trim())}`); }}
+            >
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder='Search "milk" or "bread"…'
+                aria-label="Search products"
+                className="h-10 w-full rounded-full border bg-card pl-9 pr-4 text-sm placeholder:text-muted-foreground/70 focus:outline-2 focus:outline-ring"
+              />
+            </form>
+
+            <div className="ml-auto flex items-center gap-2">
+              <Link href="/customer/offers" className="hidden items-center gap-1.5 rounded-full border bg-card px-3 py-2 text-xs font-bold transition hover:border-foreground/40 sm:flex">
+                <TicketPercent size={13} className="text-accent" /> Offers
+              </Link>
+              <Link href="/sell" className="hidden items-center gap-1.5 rounded-full border bg-card px-3 py-2 text-xs font-bold transition hover:border-foreground/40 xl:flex">
+                <Store size={13} className="text-brand" /> Add your shop
+              </Link>
+              <NotificationsBell />
+              <Link href="/customer/cart" aria-label={`Cart with ${count} items`} className="relative flex items-center gap-2 rounded-full btn-ink px-3.5 py-2 text-xs font-bold text-background transition hover:opacity-90">
+                <ShoppingBag size={14} />
+                <span className="num hidden sm:inline">{count > 0 ? `${count} item${count > 1 ? "s" : ""}` : "Cart"}</span>
+                {count > 0 && (
+                  <span className="num absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[9px] font-bold text-white sm:hidden">
+                    {count}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
+
+          {/* mobile search row */}
+          <div className="border-t px-4 py-2 md:hidden">
+            <form onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/customer/search?q=${encodeURIComponent(q.trim())}`); }} className="relative">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder='Search "milk" or "bread"…'
+                aria-label="Search products"
+                className="h-9 w-full rounded-full border bg-card pl-9 pr-4 text-sm focus:outline-2 focus:outline-ring"
+              />
+            </form>
           </div>
         </header>
 
-        <main className="flex-1 px-4 pb-28 pt-4 sm:px-6">{children}</main>
+        <main className="flex-1 pb-28 md:pb-10">{children}</main>
 
-        {/* bottom nav */}
-        <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-card/95 backdrop-blur-lg">
-          <div className="mx-auto flex max-w-3xl items-stretch justify-around px-2 py-1.5">
+        {/* desktop footer */}
+        <footer className="hidden border-t bg-card md:block">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-6 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <Logo size={26} />
+              <span>Pilot: Satellite, Ahmedabad</span>
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 font-medium">
+              <Link href="/customer/help" className="flex items-center gap-1 hover:text-brand"><CircleHelp size={12} /> Help centre</Link>
+              <Link href="/customer/offers" className="hover:text-brand">Offers</Link>
+              <Link href="/sell" className="hover:text-brand">For shops</Link>
+              <Link href="/rider" className="hover:text-brand">Ride with us</Link>
+              <span>© 2026 NearKart</span>
+            </div>
+          </div>
+        </footer>
+
+        {/* mobile bottom nav */}
+        <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-card/95 backdrop-blur-lg md:hidden">
+          <div className="flex items-stretch justify-around px-2 py-1.5">
             {NAV.map((n) => {
               const active = pathname === n.href || (n.href !== "/customer" && pathname.startsWith(n.href));
               return (
@@ -57,7 +122,7 @@ export default function CustomerLayout({ children }: LayoutProps<"/customer">) {
                   onClick={() => setRole("customer")}
                   className={cn(
                     "relative flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-[10px] font-semibold transition-colors",
-                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                    active ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   <n.icon size={18} strokeWidth={active ? 2.4 : 2} />
@@ -73,15 +138,5 @@ export default function CustomerLayout({ children }: LayoutProps<"/customer">) {
         </nav>
       </div>
     </AppReady>
-  );
-}
-
-function LogoMini() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden>
-      <rect width="40" height="40" rx="10" fill="#171812" />
-      <path d="M20 8.5c-4.3 0-7.8 3.4-7.8 7.6 0 5.5 6.8 12.1 7.4 12.7.2.3.6.3.8 0 .6-.6 7.4-7.2 7.4-12.7 0-4.2-3.5-7.6-7.8-7.6Z" fill="#fff" />
-      <path d="M21.6 13 16.2 19.4h3.2l-1 5.6 5.8-7.2h-3.4l.8-4.8Z" fill="#171812" />
-    </svg>
   );
 }

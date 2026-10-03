@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Flame, MapPin, Navigation, Target, TrendingUp, Zap } from "lucide-react";
+import { Flame, Layers, MapPin, Navigation, Target, TrendingUp, Zap } from "lucide-react";
 import { useApp } from "@/store/useApp";
 import { Badge, Button, EmptyState, Progress, Switch, StatCard, Stars } from "@/components/ui/base";
 import { inr, cn } from "@/lib/utils";
@@ -125,6 +125,7 @@ export default function RiderHome() {
                       <Badge tone="outline">{o.items.length} items</Badge>
                       <Badge tone={o.payment === "COD" ? "accent" : "brand"}>{o.payment}{o.payment === "COD" ? ` · collect ${inr(o.total)}` : ""}</Badge>
                       <Badge tone="info">~{o.etaMin} min</Badge>
+                      {o.groupCode && <Badge tone="accent"><Layers size={10} /> multi-store {o.groupCode}</Badge>}
                       {o.paymentRisk === "review" && <Badge tone="danger">risk flag</Badge>}
                     </div>
                     <div className="flex gap-2 pt-1">

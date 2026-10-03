@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --background: #fafaf8;
   --foreground: #131511;
@@ -26,29 +24,6 @@
   --btn-fg: #ffffff;
 }
 
-.dark {
-  --background: #0f100e;
-  --foreground: #eae8e2;
-  --card: #171814;
-  --card-foreground: #eae8e2;
-  --muted: #20211d;
-  --muted-foreground: #9d9c93;
-  --border: #2a2b26;
-  --brand: #10b981;
-  --brand-strong: #34d399;
-  --brand-deep: #065f46;
-  --brand-soft: rgba(16, 185, 129, 0.13);
-  --brand-softer: rgba(16, 185, 129, 0.06);
-  --accent: #d97706;
-  --accent-soft: rgba(217, 119, 6, 0.14);
-  --danger: #f87171;
-  --danger-soft: rgba(220, 38, 38, 0.15);
-  --info: #38bdf8;
-  --info-soft: rgba(3, 105, 161, 0.18);
-  --ring: #10b981;
-  --btn: #10b981;
-  --btn-fg: #04120c;
-}
 
 @theme inline {
   --color-background: var(--background);

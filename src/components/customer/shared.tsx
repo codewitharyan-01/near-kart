@@ -68,8 +68,9 @@ export function ProductQuickView({ canonical, onClose }: { canonical: Canonical 
   const shops = useApp((s) => s.shops);
   const products = useApp((s) => s.products);
   const userLoc = useApp(selectUserLoc);
+  const setQty = useApp((s) => s.setQty);
   const { add, dialog } = useAddToCart();
-  const [qty, setQty] = useState(1);
+  const [qty, setQtyLocal] = useState(1);
   const [picked, setPicked] = useState<string | null>(null); // shopId override
 
   const ranked = useMemo(() => (canonical ? rankVariants(canonical, shops, userLoc) : []), [canonical, shops, userLoc]);
@@ -142,13 +143,21 @@ export function ProductQuickView({ canonical, onClose }: { canonical: Canonical 
                 </div>
 
                 <div className="mt-4 flex items-center gap-3">
-                  <Stepper qty={qty} max={chosen?.v.stock ?? 9} onChange={(q) => setQty(Math.max(1, q))} />
+                  <Stepper
+                    qty={qty}
+                    max={chosen?.v.stock ?? 9}
+                    onChange={(q) => {
+                      setQtyLocal(Math.max(0, q));
+                      if (chosenProduct) setQty(chosenProduct.id, q); // 0 removes it from the cart
+                    }}
+                  />
                   <Button
+                    variant="brand"
                     className="flex-1"
-                    disabled={!chosenProduct}
-                    onClick={() => { if (chosenProduct) { add(chosenProduct.id, qty); onClose(); setQty(1); setPicked(null); } }}
+                    disabled={!chosenProduct || qty === 0}
+                    onClick={() => { if (chosenProduct) { add(chosenProduct.id, qty); onClose(); setQtyLocal(1); setPicked(null); } }}
                   >
-                    Add {qty > 1 ? `${qty} · ${inr((chosen?.v.price ?? canonical.price) * qty)}` : "to cart"}
+                    {qty > 1 ? `Add ${qty} · ${inr((chosen?.v.price ?? canonical.price) * qty)}` : "Add to cart"}
                   </Button>
                 </div>
               </div>
@@ -193,6 +202,7 @@ export function ProductCard({
   onQuickView?: (c: Canonical) => void;
 }) {
   const { add, dialog } = useAddToCart();
+  const setQty = useApp((s) => s.setQty);
   const cartQty = useApp((s) => s.cart.items[product.id] ?? 0);
   const out = product.stock <= 0 || product.status !== "active";
   const low = !out && product.stock <= product.lowStockThreshold;
@@ -229,7 +239,14 @@ export function ProductCard({
               <span className="num text-sm font-bold">{inr(product.price)}</span>
               {product.mrp > product.price && <span className="num ml-1 text-[11px] text-muted-foreground line-through">{product.mrp}</span>}
             </div>
-            {!out && <Stepper small qty={cartQty} max={product.stock} onChange={(q) => add(product.id, q - cartQty)} />}
+            {!out && (
+              <Stepper
+                small
+                qty={cartQty}
+                max={product.stock}
+                onChange={(q) => (cartQty > 0 ? setQty(product.id, q) : add(product.id, q))}
+              />
+            )}
             {out && <Button size="xs" variant="secondary" disabled>Notify</Button>}
           </div>
         </div>
